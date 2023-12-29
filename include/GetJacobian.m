@@ -32,7 +32,6 @@ ire = zeros(3, numberOfLinks);
 for j = 1:numberOfLinks 
     ire(:,j) = bre - bTi(1:3, 4, j);
 end
-%ire(:,5)
 
 % now can compte the linear jacobian matrix:
 % for prismatic is equl to k1
@@ -46,12 +45,5 @@ for z = 1:numberOfLinks
         Jl(:, z) = bTi (1:3, 3, z);
     end    
 end
-% Jl
 J = [Ja; Jl];
-
-
-
-
-
-
 end

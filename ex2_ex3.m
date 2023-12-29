@@ -5,7 +5,7 @@ model = load("panda.mat"); % don't worry about eventual warnings!
 %% Simulation Parameters
 ts = 0.5;
 t_start = 0.0;
-t_end = 30.0;
+t_end = 60.0;
 t = t_start:ts:t_end;
 
 %% Initial manipulator configuration
@@ -17,7 +17,7 @@ qmax = [2.8973;1.7628;2.8973;-0.0698;2.8973;3.7525;2.8973];
 % Function that gives the transformation from <base> to <e-e>, given a
 % configuration of the manipulator
 bTe = getTransform(model.franka,[q_init',0,0],'panda_link7');%DO NOT EDIT 
-bTe_init = bTe;
+bTe_init = bTe;% usefull for plot the initial position of the manipulatorc
 %% Tool frame definition
 % distnce between tool and ee
 eOt = [0, 0, 0.2104]';  
@@ -41,7 +41,8 @@ bTt_init = bTt;
 bOg = [0.55, -0.3, 0.2]';
 
 % Switch between the two cases (with and without the tool frame)
-tool = true; % change to true for using the tool
+tool = true;
+% change to true for using the tool
 if tool == true
     % frame is rotated of theta around y-axis of the robot tool initial
     % configuration
@@ -78,7 +79,7 @@ q = q_init;
 
 %% Simulation Loop
 for i = t
-   
+   disp(i);
     if tool == true % compute the error between the tool frame and goal frame
         
         % Computing transformation matrix from base to end effector 
@@ -155,7 +156,7 @@ for i = t
     q = KinematicSimulation(q(1:7), q_dot,ts, qmin, qmax);    
     % DO NOT EDIT - plot the robot moving
     %switch visuals to off for seeing only the frames
-    show(model.franka, [q',0,0], 'visuals', 'on');
+    model_franka = show(model.franka, [q',0,0], 'visuals', 'on');
     hold on
     if tool == true
         %set the window size of the figure to "full-screen" for a better visualization
@@ -164,17 +165,22 @@ for i = t
         quiver3([bOg(1);bOg(1);bOg(1)],[bOg(2);bOg(2);bOg(2)],[bOg(3);bOg(3);bOg(3)], bRg(:, 1), bRg(:, 2), bRg(:, 3), "LineWidth", 3,"Color",[1,0,0]);
         quiver3([bTt_init(1,4);bTt_init(1,4);bTt_init(1,4)],[bTt_init(2,4);bTt_init(2,4);bTt_init(2,4)],[bTt_init(3,4);bTt_init(3,4);bTt_init(3,4)], bTt_init(1:3, 1), bTt_init(1:3, 2),bTt_init(1:3, 3), "LineWidth", 3);
         quiver3([bTt(1,4);bTt(1,4);bTt(1,4)],[bTt(2,4);bTt(2,4);bTt(2,4)],[bTt(3,4);bTt(3,4);bTt(3,4)], bTt(1:3, 1), bTt(1:3, 2),bTt(1:3, 3), "LineWidth", 3,"Color",[0,1,0]);
-
+      
     else
         plot3(bTe(1,4),bTe(2,4),bTe(3,4),'go','LineWidth',15);
         plot3(bOg(1),bOg(2),bOg(3),'ro','LineWidth',5);
         quiver3([bOg(1);bOg(1);bOg(1)],[bOg(2);bOg(2);bOg(2)],[bOg(3);bOg(3);bOg(3)], bRg(:, 1), bRg(:, 2), bRg(:, 3), "LineWidth", 3,"Color",[1,0,0]);
         quiver3([bTe_init(1,4);bTe_init(1,4);bTe_init(1,4)],[bTe_init(2,4);bTe_init(2,4);bTe_init(2,4)],[bTe_init(3,4);bTe_init(3,4);bTe_init(3,4)], bTe_init(1:3, 1), bTe_init(1:3, 2),bTe_init(1:3, 3), "LineWidth", 3);
         quiver3([bTe(1,4);bTe(1,4);bTe(1,4)],[bTe(2,4);bTe(2,4);bTe(2,4)],[bTe(3,4);bTe(3,4);bTe(3,4)], bTe(1:3, 1), bTe(1:3, 2),bTe(1:3, 3), "LineWidth", 3,"Color",[0,1,0]);
+        imagefilename="Images/fig_"+ts+".png";
+        print(imagefilename,"-dpng");
+                exportgraphics(model_franka, "/home/andrea/Desktop/Roboics_Engenering/MCM/Lab3/MCM_Lab3/Images/1.png");
 
+      
     end
     drawnow
     if(norm(x_dot) < 0.001)
+        disp(t)
         disp('REACHED THE REQUESTED GOAL POSITION')
         break
     end
