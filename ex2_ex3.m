@@ -51,6 +51,7 @@ if tool == true
     Ry = [cos(theta), 0, sin(theta); 0, 1, 0; -sin(theta), 0, cos(theta)];
     % rotation mtrix from <base> to <goal>
     bRg = bTt(1:3, 1:3) * Ry;
+    % Trasformation matrix from <base> to <goal>
     bTg = [ bRg(1,1), bRg(1,2), bRg(1,3), bOg(1);
             bRg(2,1), bRg(2,2), bRg(2,3), bOg(2);
             bRg(3,1), bRg(3,2), bRg(3,3), bOg(3);
@@ -59,8 +60,11 @@ if tool == true
 
 else % no tool, only e-e
     theta = pi/6;
+    % Rotation matrix around y-axis of angle theta
     Ry = [cos(theta), 0, sin(theta); 0, 1, 0; -sin(theta), 0, cos(theta)];
+   % extract the Rotation matrix from <base> to <goal>
     bRg = bTe(1:3, 1:3) * Ry;
+    % Transformation matrix from <base> to <goal>
     bTg = [ bRg(1,1), bRg(1,2), bRg(1,3), bOg(1);
             bRg(2,1), bRg(2,2), bRg(2,3), bOg(2);
             bRg(3,1), bRg(3,2), bRg(3,3), bOg(3);
@@ -86,11 +90,11 @@ for i = t
         bTe = getTransform(model.franka, [q',0,0], 'panda_link7'); %DO NOT EDIT
         tmp = geometricJacobian(model.franka, [q',0,0], 'panda_link7'); %DO NOT EDIT
         bJe = tmp(1:6, 1:7); %DO NOT EDIT
-
+        % Trasformation matrix from <base> to <tool>
         bTt = bTe * eTt;
         % I need to write the rigid body jcobian of tool in end effector
+        
         beOt = bTe * [eOt; 0];
-
         % define the skew simmetric matrix of ert:
         skew_ert = [ 0,          -beOt(3),   0;
                      beOt(3),    0,          0;
@@ -172,11 +176,6 @@ for i = t
         quiver3([bOg(1);bOg(1);bOg(1)],[bOg(2);bOg(2);bOg(2)],[bOg(3);bOg(3);bOg(3)], bRg(:, 1), bRg(:, 2), bRg(:, 3), "LineWidth", 3,"Color",[1,0,0]);
         quiver3([bTe_init(1,4);bTe_init(1,4);bTe_init(1,4)],[bTe_init(2,4);bTe_init(2,4);bTe_init(2,4)],[bTe_init(3,4);bTe_init(3,4);bTe_init(3,4)], bTe_init(1:3, 1), bTe_init(1:3, 2),bTe_init(1:3, 3), "LineWidth", 3);
         quiver3([bTe(1,4);bTe(1,4);bTe(1,4)],[bTe(2,4);bTe(2,4);bTe(2,4)],[bTe(3,4);bTe(3,4);bTe(3,4)], bTe(1:3, 1), bTe(1:3, 2),bTe(1:3, 3), "LineWidth", 3,"Color",[0,1,0]);
-        imagefilename="Images/fig_"+ts+".png";
-        print(imagefilename,"-dpng");
-                exportgraphics(model_franka, "/home/andrea/Desktop/Roboics_Engenering/MCM/Lab3/MCM_Lab3/Images/1.png");
-
-      
     end
     drawnow
     if(norm(x_dot) < 0.001)
